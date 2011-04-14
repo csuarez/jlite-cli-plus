@@ -1,0 +1,58 @@
+Type = "Collection";
+
+InputSandbox = {
+    "input_common1.txt",
+    "input_common2.txt"
+};
+
+Nodes = {
+    [
+        JobType = "Normal";
+        NodeName = "node1";
+        Executable = "/bin/sh";
+        Arguments = "script_node1.sh";
+        InputSandbox = {
+                "script_node1.sh",
+                root.InputSandbox[0]
+            };
+        StdOutput = "myoutput1";
+        StdError  = "myerror1";
+        OutputSandbox = {
+                "myoutput1",
+                "myerror1"
+            };
+        ShallowRetryCount = 1;
+    ],[
+        JobType = "Normal";
+        NodeName = "node2";
+        Executable = "/bin/sh";
+        InputSandbox = {
+                "script_node2.sh",
+                root.InputSandbox[1]
+            };
+        Arguments = "script_node2.sh";
+        StdOutput = "myoutput2";
+        StdError  = "myerror2";
+        OutputSandbox = {
+                "myoutput2",
+                "myerror2"
+            };
+        ShallowRetryCount = 1;
+    ],[
+        JobType = "Normal";
+        NodeName = "node3";
+        Executable = "/bin/cat";
+        InputSandbox = { root.InputSandbox };
+        Arguments = "*.txt";
+        StdOutput = "myoutput3";
+        StdError  = "myerror3";
+        OutputSandbox = {
+                "myoutput3",
+                "myerror3"
+            };
+        ShallowRetryCount = 1;
+    ]
+};
+
+Requirements  = (other.GlueCEStateStatus == "Production");
+Rank = (-other.GlueCEStateEstimatedResponseTime);

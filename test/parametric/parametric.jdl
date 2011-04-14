@@ -1,0 +1,18 @@
+JobType = "Parametric";
+
+Parameters= 6;
+ParameterStep =2;
+ParameterStart = 0;
+
+Executable = "/bin/sh";
+Arguments = "message_PARAM_.sh";
+StdOutput = "myoutput_PARAM_.txt";
+StdError = "myerror_PARAM_.txt";
+
+InputSandbox = "message_PARAM_.sh";
+OutputSandbox  = {"myoutput_PARAM_.txt", "myerror_PARAM_.txt"};
+
+ShallowRetryCount = 1;
+
+Requirements  = (other.GlueCEStateStatus == "Production");
+Rank = (-other.GlueCEStateEstimatedResponseTime);

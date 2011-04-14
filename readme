@@ -1,0 +1,48 @@
+jLite: A Lightweight Java API for gLite
+Copyright 2008-2010 Oleg Sukhoroslov
+License: Apache License 2.0
+http://jlite.googlecode.com/
+
+*** DESCRIPTION ***
+
+jLite is a Java library providing simple API for accessing gLite based 
+grid infrastructure. It is intended for Java developers who struggle 
+with gLite middleware and want to reduce time and effort needed to build 
+a cross-platform grid application on top of the EGEE grid infrastructure. 
+jLite also includes a command-line interface which can be used as a simple 
+cross-platform alternative to gLite User Interface on Windows and other 
+operating systems.
+
+Existing Java APIs for gLite are scattered among several packages and 
+expose mostly low-level service operations. Available API usage examples 
+often imply the presence of gLite User Interface environment installed on 
+Scientific Linux. This complicates the use of these APIs for development 
+of cross-platform grid applications. jLite is addressing these problems by 
+providing a high-level Java API with functionality similar to gLite shell 
+commands. Current implementation supports complete gLite job management 
+lifecycle including VOMS proxy creation and delegation, transfer of job 
+input files, job submission, job status monitoring and retrieval of job 
+output files. Normal, collection and parametric gLite jobs are supported. 
+The API hides complexity of underlying middleware and its configuration. 
+jLite is easy to install because it includes all external dependencies 
+and does not require installation of gLite User Interface. The library is 
+pure Java and can be used on any Java-capable platform including Windows. 
+
+*** DOCUMENTATION ***
+
+Check /doc directory for user manual and Javadoc.
+
+*** FEEDBACK ***
+
+jLite mailing list: http://groups.google.com/group/jlite
+E-mail: oleg.sukhoroslov@gmail.com
+
+*** REFERENCE ***
+
+If you use jLite please refer to it in your papers as follows:
+
+O.V. Sukhoroslov. jLite: A Lightweight Java API for gLite. // 
+Distributed Computing and Grid-Technologies in Science and Education: 
+Proceedings of the 3rd Intern. Conf. (Dubna, June 30 - July 4, 2008). 
+- Dubna: JINR, 2008. - 401 p. (pp. 201-204)
+

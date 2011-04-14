@@ -1,0 +1,160 @@
+jLite uses the following third party libraries
+(the licenses can be found in /licenses directory)
+
+lib/glite ***********************************************************************
+
+Component:	glite-jdl-api-java.jar
+Version: 	3.1.5-2
+Organization: 	Members of the EGEE Collaboration
+URL: 		http://glite.web.cern.ch/glite/
+License Type: 	EGEE Middleware License
+
+Component:	glite-security-delegation-java.jar
+Version: 	1.4.4-1
+Organization: 	Members of the EGEE Collaboration
+URL: 		http://glite.web.cern.ch/glite/
+License Type: 	EGEE Middleware License
+
+Component:	glite-security-trustmanager.jar
+Version: 	1.8.8 (patched)
+Organization: 	Members of the EGEE Collaboration
+URL: 		http://glite.web.cern.ch/glite/
+License Type: 	EGEE Middleware License
+
+Component:	glite-security-util-java.jar
+Version: 	2.0.0-2
+Organization: 	Members of the EGEE Collaboration
+URL: 		http://glite.web.cern.ch/glite/
+License Type: 	EGEE Middleware License
+
+Component:	glite-security-voms-api-java.jar
+Version: 	1.8.11 (checked out from cvs)
+Organization: 	Members of the EGEE Collaboration
+URL: 		http://glite.web.cern.ch/glite/
+License Type: 	EGEE Middleware License
+
+Component:	glite-wms-wmproxy-api-java.jar
+Version: 	3.1.3-5
+Organization: 	Members of the EGEE Collaboration
+URL: 		http://glite.web.cern.ch/glite/
+License Type: 	EGEE Middleware License
+
+
+lib/external ********************************************************************
+
+Component:  	axis.jar
+Version: 	1.4
+Organization: 	Apache Axis
+URL: 		http://ws.apache.org/axis/
+License Type: 	Apache License, Version 2.0
+Note:		From Apache Axis 1.4 distribution
+
+Component:  	bcprov-jdk15-141.jar
+Version: 	1.41
+Organization: 	BouncyCastle.org
+URL: 		http://www.bouncycastle.org/
+License Type: 	http://www.bouncycastle.org/licence.html
+
+Component:  	classad-2.4.jar
+Version: 	2.2
+Organization: 	Condor Project
+URL: 		http://www.cs.wisc.edu/condor/classad/
+License Type: 	CONDOR (r) PUBLIC LICENSE Version 1.0, February 7, 2003 
+
+Component:  	cog-jglobus-1.6.0.jar
+Version: 	1.6.0
+Organization: 	The Java CoG Kit Project
+URL: 		http://dev.globus.org/wiki/CoG_jglobus
+License Type: 	Apache License, Version 2.0 + National Research Council of Canada (Contributor)
+
+Component:  	commons-cli-1.1.jar
+Version: 	1.1
+Organization: 	Apache Commons
+URL: 		http://jakarta.apache.org/commons/cli/
+License Type: 	Apache Software License, Version 2.0
+
+Component:  	commons-discovery-0.2.jar
+Version: 	0.2
+Organization: 	Apache Axis
+URL: 		http://jakarta.apache.org/commons/discovery/
+License Type: 	Apache Software License, Version 1.1
+Note:		From Apache Axis 1.4 distribution
+
+Component:  	commons-lang-2.4.jar
+Version: 	2.4
+Organization: 	Apache Axis
+URL: 		http://jakarta.apache.org/commons/discovery/
+License Type: 	Apache License, Version 2.0
+
+Component:  	commons-logging-1.0.4.jar
+Version: 	1.0.4
+Organization: 	Apache Axis
+URL: 		http://jakarta.apache.org/commons/logging/
+License Type: 	Apache License, Version 2.0
+Note:		From Apache Axis 1.4 distribution
+
+Component:  	cryptix.jar
+Version: 	3.2.0
+Organization: 	Cryptix.org
+URL: 		http://www.cryptix.org/
+License Type: 	Cryptix General License
+
+Component:  	cryptix32.jar
+Version: 	3.2.0
+Organization: 	Cryptix.org
+URL: 		http://www.cryptix.org/
+License Type: 	Cryptix General License
+
+Component:  	cryptix-asn1.jar
+Version: 	3.2.0
+Organization: 	Cryptix.org
+URL: 		http://sourceforge.net/projects/cryptix-asn1/
+License Type: 	Cryptix General License
+
+Component:  	jaxrpc.jar
+Version: 	1.4
+Organization: 	Apache Axis
+URL: 		http://ws.apache.org/axis/
+License Type: 	Apache License, Version 2.0
+Note:		From Apache Axis 1.4 distribution
+
+Component:	lb.jar
+Version: 	g-Eclipse 1.0RC2
+Organization: 	g-Eclipse project
+URL: 		http://www.geclipse.eu
+License Type: 	Eclipse Public License - v 1.0
+
+Component:  	log4j-1.2.15.jar
+Version: 	1.2.15
+Organization: 	Jakarta
+URL: 		http://jakarta.apache.org/log4j/
+License Type: 	Apache Software License, Version 2.0
+Note:		From Apache Axis 1.4 distribution
+
+Component:  	puretls.jar
+Version: 	0.9b4
+Organization: 	Claymore Systems
+URL: 		http://www.rtfm.com/puretls/
+License Type: 	Other
+		http://www.globus.org/toolkit/legal/4.0/licenses4.html#puretls
+
+Component:  	saaj.jar
+Version: 	1.4
+Organization: 	Apache Axis
+URL: 		http://ws.apache.org/axis/
+License Type: 	Apache License, Version 2.0
+Note:		From Apache Axis 1.4 distribution
+
+Component:  	servlet.jar
+Version: 	Tomcat 4.1
+Organization: 	Apache Jakarta Tomcat
+URL: 		http://jakarta.apache.org/tomcat/
+License Type: 	Apache Software License, Version 1.1
+
+Component:  	wsdl4j.jar
+Version: 	1.5.1
+Organization: 	Apache Axis
+URL: 		http://ws.apache.org/axis/
+License Type: 	Common Public License - v 1.0
+Note:		From Apache Axis 1.4 distribution
+

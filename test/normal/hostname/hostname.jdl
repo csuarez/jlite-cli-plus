@@ -1,0 +1,15 @@
+Type          = "Job";
+JobType       = "Normal";
+
+Executable    = "/bin/hostname";
+Arguments     = "-f";
+
+StdOutput     = "std.out";
+StdError      = "std.err";
+
+OutputSandbox = {"std.out","std.err"};
+
+RetryCount    = 3;
+
+Requirements  = (other.GlueCEStateStatus == "Production");
+Rank = (-other.GlueCEStateEstimatedResponseTime);

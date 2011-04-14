@@ -1,0 +1,16 @@
+Type          = "Job";
+JobType       = "Normal";
+
+Executable    = "/bin/sh";
+Arguments     = "test.sh Hello Grid!";
+
+StdOutput     = "std.out";
+StdError      = "std.err";
+
+InputSandbox  = {"test.sh"};
+OutputSandbox = {"std.out","std.err"};
+
+ShallowRetryCount = 10;
+
+Requirements  = (other.GlueCEStateStatus == "Production");
+Rank = (-other.GlueCEStateEstimatedResponseTime);

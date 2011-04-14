@@ -1,0 +1,25 @@
+jLite Change Log
+
+Release 0.2 - 2010-04-10
+
+  - Added methods set/getUserCredentials() and set/getProxy()  
+    to jlite.GridSessionConfig class (see Javadoc).
+  - Added two examples of using MyProxy with jLite API 
+    (jlite.examples.MyProxy/MyProxy2).
+  - Refactored demo example (jlite.examples.Demo).
+  - Enabled check for signing policy files in CA cert directory
+    (make sure you have them!).
+
+Release 0.1.1 - 2009-09-10
+
+  - Added support for VOMS_USERCONF environment variable to specify 
+    custom location of the VOMS configuration files.
+
+Release 0.1.0 - 2009-02-06
+
+  - The first proper release of jLite. 
+  - Lots of fixes and improvements, including support for collection 
+    and parametric jobs, advanced CLI options, etc...
+  - New user manual and Javadoc.
+
+Early preview release - 2008-06-29
