@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ======================================================================= -->
+<!-- DRI-IMED BUILD XML FILE                                                 -->
+<!-- ======================================================================= -->
+
+<project name="jlite-cli-plus" basedir="." default="info">
+    <description>Builds jLite CLI Plus</description>
+
+        <path id="jlite-cli-plus.classpath">
+            <fileset dir="lib/external">
+                <include name="axis.jar"></include>
+                <include name="bcprov-jdk15-141.jar"></include>
+                <include name="classad-2.4.jar"></include>
+                <include name="cog-jglobus-1.6.0.jar"></include>
+                <include name="commons-cli-1.1.jar"></include>
+                <include name="commons-discovery-0.2.jar"></include>
+                <include name="commons-lang-2.4.jar"></include>
+                <include name="commons-logging-1.0.4.jar"></include>
+                <include name="cryptix32.jar"></include>
+                <include name="cryptix-asn1.jar"></include>
+                <include name="cryptix.jar"></include>
+                <include name="jaxrpc.jar"></include>
+                <include name="lb.jar"></include>
+                <include name="log4j-1.2.15.jar"></include>
+                <include name="puretls.jar"></include>
+                <include name="saaj.jar"></include>
+                <include name="servlet.jar"></include>
+                <include name="wsdl4j-1.5.1.jar"></include>
+            </fileset>
+            <fileset dir="lib/glite">
+                <include name="glite-jdl-api-java.jar"></include>
+                <include name="glite-security-delegation-java.jar"></include>
+                <include name="glite-security-trustmanager.jar"></include>
+                <include name="glite-security-util-java.jar"></include>
+                <include name="glite-security-voms-api-java.jar"></include>
+                <include name="glite-wms-wmproxy-api-java.jar"></include>
+            </fileset>
+        </path>
+
+
+
+    <!-- ============================ JLITE-CLI-PLUS INFO ======================== -->
+    <target name="info">
+        <echo>Foo!!</echo>
+    </target>
+
+    <!-- ============================ JLITE-CLI-PLUS CLEAN======================== -->
+    <target name="clean">
+        <delete dir="dist" quiet="true"/>
+        <delete dir="build" quiet="true"/>
+    </target>
+
+    <!-- ============================ JLITE-CLI-PLUS PREPARE ===================== -->
+    <!--Prepares environments for compilations-->
+    <target name="prepare" depends="clean">
+        <mkdir dir="dist"/>
+        <mkdir dir="build"/>
+        <mkdir dir="build/src"/>
+        <mkdir dir="build/lib"/>
+        <mkdir dir="build/classes"/>
+        <copy todir="build/src" filtering="yes">
+            <fileset dir="src"></fileset>
+        </copy>
+        
+
+        <copy todir="build/lib">
+            <fileset dir="lib/external">
+                <include name="axis.jar"></include>
+                <include name="bcprov-jdk15-141.jar"></include>
+                <include name="classad-2.4.jar"></include>
+                <include name="cog-jglobus-1.6.0.jar"></include>
+                <include name="commons-cli-1.1.jar"></include>
+                <include name="commons-discovery-0.2.jar"></include>
+                <include name="commons-lang-2.4.jar"></include>
+                <include name="commons-logging-1.0.4.jar"></include>
+                <include name="cryptix32.jar"></include>
+                <include name="cryptix-asn1.jar"></include>
+                <include name="cryptix.jar"></include>
+                <include name="jaxrpc.jar"></include>
+                <include name="lb.jar"></include>
+                <include name="log4j-1.2.15.jar"></include>
+                <include name="puretls.jar"></include>
+                <include name="saaj.jar"></include>
+                <include name="servlet.jar"></include>
+                <include name="wsdl4j-1.5.1.jar"></include>
+            </fileset>
+            <fileset dir="lib/glite">
+                <include name="glite-jdl-api-java.jar"></include>
+                <include name="glite-security-delegation-java.jar"></include>
+                <include name="glite-security-trustmanager.jar"></include>
+                <include name="glite-security-util-java.jar"></include>
+                <include name="glite-security-voms-api-java.jar"></include>
+                <include name="glite-wms-wmproxy-api-java.jar"></include>
+            </fileset>
+        </copy>
+    </target>
+
+    <!-- ============================ JLITE-CLI-PLUS BUILD ======================= -->
+    <!--Compiles sources and generates the jars-->
+    <target name="build" depends="prepare">
+        <javac srcdir="build/src" destdir="build/classes" debug="on" deprecation="on" optimize="on">
+            <classpath>
+                <path refid="jlite-cli-plus.classpath"></path>
+                <pathelement location="build/src"></pathelement>
+            </classpath>
+        </javac>
+
+        <pathconvert property="mf.class-path" pathsep=" ">
+            <path refid="jlite-cli-plus.classpath"></path>
+            <chainedmapper>
+                <flattenmapper></flattenmapper>
+                <globmapper from="*" to="lib/*"></globmapper>
+            </chainedmapper>
+        </pathconvert>
+
+        <echo file="build/manifest.mf">Manifest-Version: 1.0</echo>
+
+        <jar jarfile="build/jlite.jar">
+            <manifest>
+                <attribute name="Class-Path" value="${mf.class-path}"></attribute>
+            </manifest>
+            <fileset dir="build/classes" includes="**/*.class"></fileset>
+        </jar>
+    </target>
+
+    <!-- ============================ JLITE-CLI-PLUS DIST ======================== -->
+    <!--Generates distributables packages-->
+    <target name="dist" depends="build">
+        <copy todir="dist/cli">
+            <fileset dir="cli"/>
+        </copy>
+
+        <copy todir="dist/etc">
+            <fileset dir="etc"/>
+        </copy>
+
+        <copy todir="dist/licenses">
+            <fileset dir="licenses"/>
+        </copy>
+
+        <copy todir="dist/lib">
+            <fileset dir="lib"/>
+        </copy>
+
+        <copy todir="dist/doc">
+            <fileset dir="doc"/>
+        </copy>
+
+        <copy todir="dist/test">
+            <fileset dir="test"/>
+        </copy>
+
+        <copy todir="dist/lib" file="build/jlite.jar"/>
+
+        <copy todir="dist" file="README"/>
+        <copy todir="dist" file="third_party"/>
+        <copy todir="dist" file="changelog"/>
+        <copy todir="dist" file="log4j.properties"/>
+        <copy todir="dist" file="license"/>
+        <copy todir="dist" file="notice"/>
+    </target>
+</project>
