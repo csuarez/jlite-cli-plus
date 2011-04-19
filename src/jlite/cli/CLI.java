@@ -18,7 +18,7 @@ package jlite.cli;
 
 public class CLI {
 
-	public static final String VERSION = "0.2";
-	public static final String FOOTER = "You are using jLite CLI v" + CLI.VERSION;
+	public static final String VERSION = "ALPHA";
+	public static final String FOOTER = "You are using jLite CLI Plus " + CLI.VERSION;
 	
 }
