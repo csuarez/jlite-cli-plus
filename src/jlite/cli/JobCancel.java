@@ -81,6 +81,12 @@ public class JobCancel {
                 .withDescription("WMProxy service endpoint")
                 .hasArg()
                 .create("e"));
+
+         options.addOption(OptionBuilder
+                .withArgName("proxyfile")
+                .withDescription("non-standard location of proxy cert")
+                .hasArg()
+                .create("proxypath"));
         
         return options;
 	}
@@ -89,6 +95,10 @@ public class JobCancel {
 		GridSessionConfig conf = new GridSessionConfig();
 		GridSession grid = GridSessionFactory.create(conf);
 				
+		if (line.hasOption("proxypath")) {
+            conf.setProxyPath(line.getOptionValue("proxypath"));
+        }
+
 		List<String> jobIds = new ArrayList<String>();;
 		if (jobIdArgs.length > 0) {
 			for (String jobId : jobIdArgs) {
