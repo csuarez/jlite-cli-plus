@@ -96,6 +96,12 @@ public class JobOutput {
         options.addOption(OptionBuilder
                 .withDescription("do not retrieve output files, just print their URIs")
                 .create("list"));
+
+        options.addOption(OptionBuilder
+                .withArgName("proxyfile")
+                .withDescription("non-standard location of proxy cert")
+                .hasArg()
+                .create("proxypath"));
         
 //      options.addOption(OptionBuilder
 //		.withArgName("protocol")
@@ -108,6 +114,11 @@ public class JobOutput {
 
 	private static void run(String[] jobIdArgs, CommandLine line) throws Exception {
 		GridSessionConfig conf = new GridSessionConfig();
+
+		if (line.hasOption("proxypath")) {
+            conf.setProxyPath(line.getOptionValue("proxypath"));
+        }
+		
 		GridSession grid = GridSessionFactory.create(conf);
 				
 		List<String> jobIds = new ArrayList<String>();;
