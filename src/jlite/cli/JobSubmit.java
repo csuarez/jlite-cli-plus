@@ -125,6 +125,12 @@ public class JobSubmit {
                 .hasArg()
                 .create("e"));
         
+        options.addOption(OptionBuilder
+                .withArgName("proxyfile")
+                .withDescription("non-standard location of proxy cert")
+                .hasArg()
+                .create("proxypath"));
+        
 //        options.addOption(OptionBuilder
 //        		.withArgName("protocol")
 //                .withDescription("protocol to be used for file tranfer {gsiftp,https} (default is gsiftp)")
@@ -142,6 +148,10 @@ public class JobSubmit {
 		
 		GridSessionConfig conf = new GridSessionConfig();
 		GridSession grid;        
+
+        if (line.hasOption("proxypath")) {
+            conf.setProxyPath(line.getOptionValue("proxypath"));
+        }
 
 		String vo = Util.readVOFromVOMSProxy(conf.getProxyPath());
 		System.out.println("Working VO: " + vo);
