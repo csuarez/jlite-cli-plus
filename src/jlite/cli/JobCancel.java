@@ -93,11 +93,12 @@ public class JobCancel {
 
 	private static void run(String[] jobIdArgs, CommandLine line) throws Exception {
 		GridSessionConfig conf = new GridSessionConfig();
-		GridSession grid = GridSessionFactory.create(conf);
-				
+
 		if (line.hasOption("proxypath")) {
             conf.setProxyPath(line.getOptionValue("proxypath"));
         }
+		
+		GridSession grid = GridSessionFactory.create(conf);
 
 		List<String> jobIds = new ArrayList<String>();;
 		if (jobIdArgs.length > 0) {
