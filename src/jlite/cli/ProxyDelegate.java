@@ -77,14 +77,27 @@ public class ProxyDelegate {
                 .withDescription("WMProxy service endpoint")
                 .hasArg()
                 .create("e"));
+
+        options.addOption(OptionBuilder
+                .withArgName("proxyfile")
+                .withDescription("non-standard location of proxy cert")
+                .hasArg()
+                .create("proxypath"));
+
+          
         
         return options;
 	}
 
 	private static void run(CommandLine line) throws Exception {
 		GridSessionConfig conf = new GridSessionConfig();
-		GridSession grid = GridSessionFactory.create(conf);
+
+		if (line.hasOption("proxypath")) {
+            conf.setProxyPath(line.getOptionValue("proxypath"));
+        }
 		
+		GridSession grid = GridSessionFactory.create(conf);
+
 		String vo = Util.readVOFromVOMSProxy(conf.getProxyPath());
 		System.out.println("Working VO: " + vo);
 		String wmProxyURL = conf.getWMProxies().get(vo);
