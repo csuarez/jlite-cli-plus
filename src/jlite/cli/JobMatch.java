@@ -95,6 +95,12 @@ public class JobMatch {
                 .withDescription("WMProxy service endpoint")
                 .hasArg()
                 .create("e"));
+
+        options.addOption(OptionBuilder
+                .withArgName("proxyfile")
+                .withDescription("non-standard location of proxy cert")
+                .hasArg()
+                .create("proxypath"));
         
         return options;
 	}
@@ -102,6 +108,10 @@ public class JobMatch {
 	private static void run(String jdlFile, CommandLine line) throws Exception {
 		GridSessionConfig conf = new GridSessionConfig();
 		GridSession grid;        
+
+        if (line.hasOption("proxypath")) {
+            conf.setProxyPath(line.getOptionValue("proxypath"));
+        }
 
 		String vo = Util.readVOFromVOMSProxy(conf.getProxyPath());
 		System.out.println("Working VO: " + vo);
