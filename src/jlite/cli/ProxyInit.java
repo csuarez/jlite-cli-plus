@@ -117,6 +117,12 @@ public class ProxyInit {
                 .withDescription("non-standard location of VOMS configuration files")
                 .hasArg()
                 .create("vomses"));
+
+        options.addOption(OptionBuilder
+        		.withArgName("key")
+                .withDescription("set your private key passphrase without any prompt")
+                .hasArg()
+                .create("password"));
         
         return options;
 	}
@@ -133,8 +139,14 @@ public class ProxyInit {
 		}
 		if (line.hasOption("vomses")) {
 			conf.setVOMSDir(line.getOptionValue("vomses"));
-		}		
-		conf.setUserKeyPass(PasswordPrompt.prompt("Enter your private key passphrase: "));		
+		}
+		
+		if (line.hasOption("password")) {
+			conf.setUserKeyPass(line.getOptionValue("password"));
+		} else {		
+			conf.setUserKeyPass(PasswordPrompt.prompt("Enter your private key passphrase: "));		
+		}
+
 		GridSession grid = GridSessionFactory.create(conf);
 		
 		int lifetime = 43200; // 12 hours by default
