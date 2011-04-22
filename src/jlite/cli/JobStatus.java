@@ -79,6 +79,12 @@ public class JobStatus {
                 .hasArg()
                 .create("i"));
 
+        options.addOption(OptionBuilder
+                .withArgName("proxyfile")
+                .withDescription("non-standard location of proxy cert")
+                .hasArg()
+                .create("proxypath"));
+
 //        options.addOption(OptionBuilder
 //        		.withArgName("level")
 //                .withDescription("sets verbosity level of displayed information")
@@ -90,6 +96,11 @@ public class JobStatus {
 
 	private static void run(String[] jobIdArgs, CommandLine line) throws Exception {
 		GridSessionConfig conf = new GridSessionConfig();
+
+		if (line.hasOption("proxypath")) {
+            conf.setProxyPath(line.getOptionValue("proxypath"));
+        }
+		
 		GridSession grid = GridSessionFactory.create(conf);
 
 		List<String> jobIds = new ArrayList<String>();;
