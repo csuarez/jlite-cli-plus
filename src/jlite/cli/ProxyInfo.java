@@ -49,13 +49,17 @@ public class ProxyInfo {
 	    Options options = setupOptions();
 	    HelpFormatter helpFormatter = new HelpFormatter();
 	    helpFormatter.setSyntaxPrefix("Usage: ");
+	    CommandLine line = null;
 		try {
-			CommandLine line = parser.parse(options, args);
+			line = parser.parse(options, args);
             if (line.hasOption("help")) {
             	helpFormatter.printHelp(100, COMMAND, "\noptions:", options, "\n"+CLI.FOOTER+"\n", false);
             	System.out.println(); // extra line
                 System.exit(0);
             }
+            if (line.hasOption("xml")) {
+				System.out.println("<output>");
+			}
             run(line);
 		} catch (ParseException e) {
 			System.err.println(e.getMessage() + "\n");
@@ -63,7 +67,15 @@ public class ProxyInfo {
             System.out.println(); // extra line
             System.exit(-1);
 		} catch (Exception e) {
-			System.err.println(e.getMessage());
+			if (line.hasOption("xml")) {
+				System.out.println("<error>" + e.getMessage() + "</error>");
+			} else {
+				System.err.println(e.getMessage());
+			}
+		} finally {
+			if (line.hasOption("xml")) {
+				System.out.println("</output>");
+			}
 		}
 		System.out.println(); // extra line
 	}
@@ -80,6 +92,11 @@ public class ProxyInfo {
                 .withDescription("non-standard location of proxy")
                 .hasArg()
                 .create("file"));
+
+        options.addOption(OptionBuilder
+        		.withArgName("xml")
+                .withDescription("output as xml")
+                .create("xml"));
         
         return options;
 	}
@@ -91,36 +108,68 @@ public class ProxyInfo {
 		}			
 		GridSession grid = GridSessionFactory.create(conf);
 		GlobusCredential proxy = grid.getProxy();
+
+		long expiryTime = System.currentTimeMillis() + proxy.getTimeLeft()*1000;
+		SimpleDateFormat df = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy z", Locale.ENGLISH);
 		
 		if (proxy != null) {
-			System.out.println("Subject: " + proxy.getSubject());
-			System.out.println("Issuer: " + proxy.getIssuer());
-			System.out.println("Identity: " + proxy.getIdentity());
-			System.out.println("Type: " + CertUtil.getProxyTypeAsString(proxy.getProxyType()));			
-			System.out.println("Strength: " + proxy.getStrength() + " bits");
-			System.out.println("Path: " + new File(conf.getProxyPath()).getAbsolutePath());
-			long expiryTime = System.currentTimeMillis() + proxy.getTimeLeft()*1000;
-			SimpleDateFormat df = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy z", Locale.ENGLISH);				
-			System.out.println("Valid until: " + df.format(new Date(expiryTime)));
-			System.out.println("Time left: " + Util.secondsToHHMMSS(proxy.getTimeLeft()));
-			
+			if (line.hasOption("xml")) {
+				System.out.println("<subject>" + proxy.getSubject() + "</subject>");
+				System.out.println("<issuer>" + proxy.getIssuer() + "</issuer>");
+				System.out.println("<identity>" + proxy.getIdentity() + "</identity>");
+				System.out.println("<proxyType>" + CertUtil.getProxyTypeAsString(proxy.getProxyType()) + "</proxyType>");			
+				System.out.println("<strength>" + proxy.getStrength() + "</strength>");
+				System.out.println("<proxyPath>" + new File(conf.getProxyPath()).getAbsolutePath() + "</proxyPath>");				
+				System.out.println("<expirationTime>" + df.format(new Date(expiryTime)) + "</expirationTime>");
+				System.out.println("<timeLeft>" + Util.secondsToHHMMSS(proxy.getTimeLeft()) + "</timeLeft>");
+			} else {
+				System.out.println("Subject: " + proxy.getSubject());
+				System.out.println("Issuer: " + proxy.getIssuer());
+				System.out.println("Identity: " + proxy.getIdentity());
+				System.out.println("Type: " + CertUtil.getProxyTypeAsString(proxy.getProxyType()));			
+				System.out.println("Strength: " + proxy.getStrength() + " bits");
+				System.out.println("Path: " + new File(conf.getProxyPath()).getAbsolutePath());				
+				System.out.println("Valid until: " + df.format(new Date(expiryTime)));
+				System.out.println("Time left: " + Util.secondsToHHMMSS(proxy.getTimeLeft()));
+			}
 			// VOMS Attributes
 			Vector<VOMSAttribute> atts = VOMSValidator.parse(proxy.getCertificateChain());
-			for (VOMSAttribute att : atts) {
-				System.out.println("\n=== VO " + att.getVO() + " extension information ===");
-				System.out.println("VO: " + att.getVO());
-				System.out.println("Holder: " + att.getHolder());
-				System.out.println("Issuer: " + att.getIssuer());
-				for (Object fqan : att.getListOfFQAN()) {
-					System.out.println("Attribute: " + fqan);
-				}
-				System.out.println("Valid until: " + df.format(att.getNotAfter()));
-				System.out.println("Time left: " + Util.secondsToHHMMSS(
-						(att.getNotAfter().getTime() - System.currentTimeMillis())/1000));				
+			if (line.hasOption("xml")) {
+				System.out.println("<vos>");
 			}
-			
+			for (VOMSAttribute att : atts) {
+				if (line.hasOption("xml")) {
+					System.out.println("<vo>");
+					System.out.println("<name>" + att.getVO() + "</name>");
+					System.out.println("<holder>" + att.getHolder() + "</holder>");
+					System.out.println("<issuer>" + att.getIssuer() + "</issuer>");
+					System.out.println("<fqan>");
+					for (Object fqan : att.getListOfFQAN()) {
+						System.out.println("<attribute>" + fqan + "</attribute>");
+					}
+					System.out.println("</fqan>");
+					System.out.println("<expirationTime>" + df.format(att.getNotAfter()) + "</expirationTime>");
+					System.out.println("<timeLeft>" + Util.secondsToHHMMSS(
+							(att.getNotAfter().getTime() - System.currentTimeMillis())/1000) + "</timeLeft>");
+					System.out.println("</vo>");
+				} else {
+					System.out.println("\n=== VO " + att.getVO() + " extension information ===");
+					System.out.println("VO: " + att.getVO());
+					System.out.println("Holder: " + att.getHolder());
+					System.out.println("Issuer: " + att.getIssuer());
+					for (Object fqan : att.getListOfFQAN()) {
+						System.out.println("Attribute: " + fqan);
+					}
+					System.out.println("Valid until: " + df.format(att.getNotAfter()));
+					System.out.println("Time left: " + Util.secondsToHHMMSS(
+							(att.getNotAfter().getTime() - System.currentTimeMillis())/1000));
+				}		
+			}
+			if (line.hasOption("xml")) {
+				System.out.println("</vos>");
+			}
 		} else {
-			System.out.println("Proxy not found: " + conf.getProxyPath());
+			throw new Exception("Proxy not found: " + conf.getProxyPath());
 		}
 	}
 
