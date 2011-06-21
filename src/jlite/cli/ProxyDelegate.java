@@ -40,13 +40,17 @@ public class ProxyDelegate {
 	    Options options = setupOptions();
 	    HelpFormatter helpFormatter = new HelpFormatter();
 	    helpFormatter.setSyntaxPrefix("Usage: ");
+	    CommandLine line = null;
 		try {
-			CommandLine line = parser.parse(options, args);
+			line = parser.parse(options, args);
             if (line.hasOption("help")) {                
             	helpFormatter.printHelp(100, COMMAND, "\noptions:", options, "\n"+CLI.FOOTER, false);
             	System.out.println(); // extra line
                 System.exit(0);
             }
+            if (line.hasOption("xml")) {
+				System.out.println("<output>");
+			}
             run(line);
 		} catch (ParseException e) {
 			System.err.println(e.getMessage() + "\n");
@@ -54,7 +58,15 @@ public class ProxyDelegate {
             System.out.println(); // extra line
             System.exit(-1);
 		} catch (Exception e) {
-			System.err.println(e.getMessage());
+			if ((line != null) && (line.hasOption("xml"))) {
+				System.out.println("<error>" + e.getMessage() + "</error>");
+			} else {
+				System.err.println(e.getMessage());
+			}
+		} finally {
+			if (line.hasOption("xml")) {
+				System.out.println("</output>");
+			}
 		}
 		System.out.println(); // extra line
 	}
@@ -83,7 +95,11 @@ public class ProxyDelegate {
                 .withDescription("non-standard location of proxy cert")
                 .hasArg()
                 .create("proxypath"));
-
+        
+        options.addOption(OptionBuilder
+        		.withArgName("xml")
+                .withDescription("output as xml")
+                .create("xml"));
           
         
         return options;
@@ -99,7 +115,11 @@ public class ProxyDelegate {
 		GridSession grid = GridSessionFactory.create(conf);
 
 		String vo = Util.readVOFromVOMSProxy(conf.getProxyPath());
-		System.out.println("Working VO: " + vo);
+		if (line.hasOption("xml")) {
+			System.out.println("<vo>" + vo + "</vo>");
+		} else {
+			System.out.println("Working VO: " + vo);
+		}
 		String wmProxyURL = conf.getWMProxies().get(vo);
 		if (line.hasOption("e")) {
 			wmProxyURL = line.getOptionValue("e");
@@ -107,13 +127,21 @@ public class ProxyDelegate {
 		if (wmProxyURL == null) {
 			throw new GridAPIException("Could not find WMProxy server for VO: " + vo);
 		}
-		System.out.println("Connecting to WMProxy service: " + wmProxyURL);
-		
+		if (line.hasOption("xml")) {
+			System.out.println("<wmProxyURL>" + wmProxyURL + "</wmProxyURL>");
+		} else {
+			System.out.println("Connecting to WMProxy service: " + wmProxyURL);
+		}
+
 		String delegationId = line.getOptionValue("d", System.getProperty("user.name"));	
 		grid.delegateProxy(wmProxyURL, delegationId);
-		
-		System.out.println("Your proxy has been successfully delegated to WMProxy\n" + 
+
+		if (line.hasOption("xml")) {
+			System.out.println("<delegationId>" + delegationId + "</delegationId>");
+		} else {
+			System.out.println("Your proxy has been successfully delegated to WMProxy\n" + 
 				"Delegation identifier: " + delegationId);
+		}
 	}
 
 }
