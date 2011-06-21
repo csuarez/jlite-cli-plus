@@ -67,9 +67,6 @@ public class ProxyInit {
             	} else {
             		throw new MissingArgumentException("Missing required argument: <voms>[:<command>]");
             	}
-            	if (line.hasOption("xml")) {
-					System.out.println("</output>");
-				}
             }
 		} catch (ParseException e) {
             System.err.println("\n" + e.getMessage() + "\n");
@@ -81,6 +78,10 @@ public class ProxyInit {
 				System.out.println("<error>" + e.getMessage() + "</error>");
 			} else {
 				System.err.println(e.getMessage());
+			}
+		} finally {
+			if (line.hasOption("xml")) {
+					System.out.println("</output>");	
 			}
 		}
 		System.out.println(); // extra line
@@ -185,7 +186,7 @@ public class ProxyInit {
 		GlobusCredential proxy = grid.createProxy(vomsArgs, lifetime, proxyType, limited);
 
 		if (line.hasOption("xml")) {
-			System.out.println("<voms-proxy>" + proxy.getSubject() + "</voms-proxy>");
+			System.out.println("<vomsProxy>" + proxy.getSubject() + "</vomsProxy>");
 		} else {
 			System.out.println("Created VOMS proxy: " + proxy.getSubject());
 		}
@@ -193,13 +194,13 @@ public class ProxyInit {
 		long expiryTime = System.currentTimeMillis() + proxy.getTimeLeft()*1000;
 		SimpleDateFormat df = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy z", Locale.ENGLISH);
 		if (line.hasOption("xml")) {
-			System.out.println("<valid-until>" + df.format(new Date(expiryTime)) + "</valid-until>");
+			System.out.println("<expirationTime>" + df.format(new Date(expiryTime)) + "</expirationTime>");
 		} else {				
 			System.out.println("Proxy is valid until: " + df.format(new Date(expiryTime)));
 		}
 
 		if (line.hasOption("xml")) {
-			System.out.println("<proxy-location>" + new File(conf.getProxyPath()).getAbsolutePath() + "</proxy-location>");
+			System.out.println("<proxyPath>" + new File(conf.getProxyPath()).getAbsolutePath() + "</proxyPath>");
 		} else {
 			System.out.println("Proxy location: " + new File(conf.getProxyPath()).getAbsolutePath());
 		}
