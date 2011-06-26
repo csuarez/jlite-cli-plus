@@ -46,13 +46,17 @@ public class JobStatus {
 	    Options options = setupOptions();
 	    HelpFormatter helpFormatter = new HelpFormatter();
 	    helpFormatter.setSyntaxPrefix("Usage: ");
+	    CommandLine line = null;
 		try {
-			CommandLine line = parser.parse(options, args);
+			line = parser.parse(options, args);
             if (line.hasOption("help")) {                
             	helpFormatter.printHelp(100, COMMAND, "\noptions:", options, "\n"+CLI.FOOTER, false);
             	System.out.println(); // extra line
                 System.exit(0);
             } else {
+            	if (line.hasOption("xml")) {
+					System.out.println("<output>");
+				}
             	run(line.getArgs(), line);
             }
 		} catch (ParseException e) {
@@ -61,7 +65,13 @@ public class JobStatus {
             System.out.println(); // extra line
             System.exit(-1);
 		} catch (Exception e) {
-			System.err.println(e.getMessage());
+			if (line.hasOption("xml")) {
+				System.out.println("<error>" + e.getMessage() + "</error>");
+			} else {
+				System.err.println(e.getMessage());
+			}
+		} finally {
+			System.out.println("</output>");
 		}
 		System.out.println(); // extra line
 	}
@@ -84,6 +94,11 @@ public class JobStatus {
                 .withDescription("non-standard location of proxy cert")
                 .hasArg()
                 .create("proxypath"));
+
+        options.addOption(OptionBuilder
+        		.withArgName("xml")
+                .withDescription("output as xml")
+                .create("xml"));
 
 //        options.addOption(OptionBuilder
 //        		.withArgName("level")
@@ -123,67 +138,160 @@ public class JobStatus {
 		for (String jobId : jobIds) {
 		
 			org.glite.wsdl.types.lb.JobStatus status = grid.getJobStatus(jobId);
-	        
-			System.out.println("Status info for the job\n" + jobId + "\n");
-			System.out.print("Current status: " + status.getState().getValue());
+	        if (line.hasOption("xml")) {
+				System.out.println("<jobId>" + jobId + "</jobId>");
+			} else {
+				System.out.println("Status info for the job\n" + jobId + "\n");
+			}
+
+			if (line.hasOption("xml")) {
+				System.out.println("<status>" + status.getState().getValue() + "</status>");
+			} else {
+				System.out.print("Current status: " + status.getState().getValue());
+			}
 			if (status.getState().equals(StatName.DONE)) {
-				System.out.println(" (" + status.getDoneCode().getValue() + ")");
+				if (line.hasOption("xml")) {
+					System.out.println("<statusDoneCode>" + status.getDoneCode().getValue() + "</statusDoneCode>");
+				} else {
+					System.out.println(" (" + status.getDoneCode().getValue() + ")");
+				}
 			} else {
 				System.out.print("\n");
 			}
-			System.out.println("Status reason: " + status.getReason());
+
+			if (line.hasOption("xml")) {
+					System.out.println("<statusReason>" + status.getReason() + "</statusReason>");
+			} else {
+				System.out.println("Status reason: " + status.getReason());
+			}
 			
-	        System.out.println("\nJob state history:");	        
+			if (line.hasOption("xml")) {
+				System.out.println("<jobStatusHistory>");
+			} else {
+	        	System.out.println("\nJob state history:");
+	        }        
 	        StateEnterTimesItem[] states = status.getStateEnterTimes();
 	        SimpleDateFormat df = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH);
 	        for (StateEnterTimesItem state : states) {
 	        	if (state.getTime().getTimeInMillis() != 0) {
-	        		System.out.println("\t" + df.format(state.getTime().getTime()) + "\t" + state.getState().getValue());
+	        		if (line.hasOption("xml")) {
+						System.out.println("<historyEntry>");
+						System.out.println("<status>" + status.getState().getValue() + "</status>");
+						System.out.println("<time>" + df.format(state.getTime().getTime()) + "</time>");
+						System.out.println("</historyEntry>");
+					} else {
+	        			System.out.println("\t" + df.format(state.getTime().getTime()) + "\t" + state.getState().getValue());
+	        		}
 	        	}
 	        }
-	        
-			System.out.println("\nDestination: " + status.getDestination());
-	        System.out.println("CPU Time: " + status.getCpuTime());
-	        System.out.println("Exit code: " + status.getExitCode());
-	        
+	        if (line.hasOption("xml")) {
+				System.out.println("</jobStatusHistory>");
+			}
+
+	        if (line.hasOption("xml")) {
+	        	System.out.println("<destination>" + status.getDestination() + "</destination>");
+		        System.out.println("<cpuTime>" + status.getCpuTime() + "</cpuTime>");
+		        System.out.println("<exitCode>" + status.getExitCode() + "</exitCode>");
+	        } else {
+				System.out.println("\nDestination: " + status.getDestination());
+		        System.out.println("CPU Time: " + status.getCpuTime());
+		        System.out.println("Exit code: " + status.getExitCode());
+	        }
 	        
 	        org.glite.wsdl.types.lb.JobStatus[] children = status.getChildrenStates();
 	        if (children != null && children.length > 0) {
-	        	System.out.println("\nJob has " + children.length + " children **************************************** ");
 	        	
+	        	 if (line.hasOption("xml")) {
+	        	 	System.out.println("<childrenStatus>");
+	        	 } else {
+	        		System.out.println("\nJob has " + children.length + " children **************************************** "); 	
+	        	 }
 		        for (org.glite.wsdl.types.lb.JobStatus child : children) {
-		    		System.out.println("\nStatus info for the job\n" + child.getJobId() + "\n");
+		        	if (line.hasOption("xml")) {
+	        	 		System.out.println("<child>");
+	        	 		System.out.println("<jobId>" + child.getJobId() + "</jobId>");
+	        	 	} else {
+		    			System.out.println("\nStatus info for the job\n" + child.getJobId() + "\n");
+		    		}
 		    		JobAd jdl = new JobAd(child.getJdl());
 		    		if (jdl.hasAttribute("NodeName")) {
-		    			System.out.println("Node name: " + jdl.getString("NodeName"));
+		    			if (line.hasOption("xml")) {
+	        	 			System.out.println("<nodeName>" + jdl.getString("NodeName") + "</nodeName>");
+	        	 		} else {
+		    				System.out.println("Node name: " + jdl.getString("NodeName"));
+		    			}
 		    		}
-		    		System.out.print("Current status: " + child.getState().getValue());
+
+		    		if (line.hasOption("xml")) {
+	        	 		System.out.println("<status>" + child.getState().getValue() + "</status>");
+	        	 	} else {
+		    			System.out.print("Current status: " + child.getState().getValue());
+		    		}
+
 		    		if (child.getState().equals(StatName.DONE)) {
-		    			System.out.println(" (" + child.getDoneCode().getValue() + ")");
+		    			if (line.hasOption("xml")) {
+	        	 			System.out.println("<statusDoneCode>" + child.getDoneCode().getValue() + "</statusDoneCode>");
+	        	 		} else {
+		    				System.out.println(" (" + child.getDoneCode().getValue() + ")");
+		    			}
 		    		} else {
 		    			System.out.print("\n");
 		    		}
-		    		System.out.println("Status reason: " + child.getReason());
+
+		    		if (line.hasOption("xml")) {
+	        	 		System.out.println("<statusReason>" + child.getReason() + "</statusReason>");
+	        	 	} else {
+		    			System.out.println("Status reason: " + child.getReason());
+		    		}
 		    		
-		            System.out.println("\nJob state history:");	        
+		    		if (line.hasOption("xml")) {
+		            	System.out.println("<jobStatusHistory>");
+		            } else {
+		            	System.out.println("\nJob state history:");
+		            }	        
 		            states = child.getStateEnterTimes();            
 		            for (StateEnterTimesItem state : states) {
 		            	if (state.getTime().getTimeInMillis() != 0) {
-		            		System.out.println("\t" + df.format(state.getTime().getTime()) + "\t" + state.getState().getValue());
-		            	}
+							if (line.hasOption("xml")) {
+								System.out.println("<historyEntry>");
+								System.out.println("<status>" + status.getState().getValue() + "</status>");
+								System.out.println("<time>" + df.format(state.getTime().getTime()) + "</time>");
+								System.out.println("</historyEntry>");
+							} else {
+			        			System.out.println("\t" + df.format(state.getTime().getTime()) + "\t" + state.getState().getValue());
+			        		}		            	
+			        	}
+		            }
+
+		            if (line.hasOption("xml")) {
+		            	System.out.println("</jobStatusHistory>");
 		            }
 		            
-		    		System.out.println("\nDestination: " + child.getDestination());
-		            System.out.println("CPU Time: " + child.getCpuTime());
-		            System.out.println("Exit code: " + child.getExitCode());
-		            
-			        System.out.println("\n-----------------------------------------------------------");
+		            if (line.hasOption("xml")) {
+		            	System.out.println("<destination>" + child.getDestination() + "</destination>");
+		        		System.out.println("<cpuTime>" + child.getCpuTime() + "</cpuTime>");
+		        		System.out.println("<exitCode>" + child.getExitCode() + "</exitCode>");
+		            } else {
+		            	System.out.println("\nDestination: " + child.getDestination());
+		            	System.out.println("CPU Time: " + child.getCpuTime());
+		            	System.out.println("Exit code: " + child.getExitCode());
+		            }
+		    		
+		            if (line.hasOption("xml")) {
+	        	 		System.out.println("</child>");
+	        	 	} else {
+			        	System.out.println("\n-----------------------------------------------------------");
+			        }
 		        }
 		        
 	        }
 	        
 	        if (jobIds.size() > 1) {
-	        	System.out.println("\n******************************************************************\n");
+	        	if (line.hasOption("xml")) {
+	        		System.out.println("</childrenStatus>");
+		        } else {
+	        		System.out.println("\n******************************************************************\n");
+	        	}
 	        }
 		}
 

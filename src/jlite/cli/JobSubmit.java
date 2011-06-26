@@ -215,7 +215,7 @@ public class JobSubmit {
         			Expr.EQUAL,
         			Constant.getInstance("other.GlueCEUniqueID"),
         			Constant.getInstance(line.getOptionValue("r")));
-        	jad.dettribute("Requirements");
+        	jad.delAttribute("Requirements");
         	jad.setAttribute("Requirements", expr);
         }
         
