@@ -40,13 +40,19 @@ public class ProxyDestroy {
 	    Options options = setupOptions();
 	    HelpFormatter helpFormatter = new HelpFormatter();
 	    helpFormatter.setSyntaxPrefix("Usage: ");
+	    CommandLine line = null;
 		try {
-			CommandLine line = parser.parse(options, args);
+			line = parser.parse(options, args);
             if (line.hasOption("help")) {                
             	helpFormatter.printHelp(100, COMMAND, "\noptions:", options, "\n"+CLI.FOOTER, false);
             	System.out.println(); // extra line
                 System.exit(0);
             }
+
+            if (line.hasOption("xml")) {
+				System.out.println("<output>");
+			}
+
             run(line);
 		} catch (ParseException e) {
 			System.err.println(e.getMessage() + "\n");
@@ -54,7 +60,13 @@ public class ProxyDestroy {
             System.out.println(); // extra line
             System.exit(-1);
 		} catch (Exception e) {
-			System.err.println(e.getMessage());
+			if (line.hasOption("xml")) {
+				System.out.println("<error>" + e.getMessage() + "</error>");
+			} else {
+				System.err.println(e.getMessage());
+			}
+		} finally {
+			System.out.println("</output>");
 		}
 		System.out.println(); // extra line
 	}
@@ -72,6 +84,11 @@ public class ProxyDestroy {
                 .hasArg()
                 .create("file"));
 
+        options.addOption(OptionBuilder
+        		.withArgName("xml")
+                .withDescription("output as xml")
+                .create("xml"));
+
         return options;
 	}
 
@@ -82,7 +99,11 @@ public class ProxyDestroy {
 		}			
 		GridSession grid = GridSessionFactory.create(conf);
 		grid.destroyProxy();
-		System.out.println("Proxy is destroyed: " + new File(conf.getProxyPath()).getAbsolutePath());
+		if (line.hasOption("xml")) {
+			System.out.println("<fileDestroyed>" + new File(conf.getProxyPath()).getAbsolutePath() + "</fileDestroyed>");
+		} else {
+			System.out.println("Proxy is destroyed: " + new File(conf.getProxyPath()).getAbsolutePath());
+		}
 	}
 
 }
