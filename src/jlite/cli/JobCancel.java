@@ -43,13 +43,17 @@ public class JobCancel {
 	    Options options = setupOptions();
 	    HelpFormatter helpFormatter = new HelpFormatter();
 	    helpFormatter.setSyntaxPrefix("Usage: ");
+	    CommandLine line = null;
 		try {
-			CommandLine line = parser.parse(options, args);
+			line = parser.parse(options, args);
             if (line.hasOption("help")) {                
             	helpFormatter.printHelp(100, COMMAND, "\noptions:", options, "\n"+CLI.FOOTER, false);
         		System.out.println(); // extra line
                 System.exit(0);
             } else {
+            	if (line.hasOption("xml")) {
+                    System.out.println("<output>");
+                }
             	run(line.getArgs(), line);
             }
 		} catch (ParseException e) {
@@ -58,7 +62,15 @@ public class JobCancel {
     		System.out.println(); // extra line
             System.exit(-1);
 		} catch (Exception e) {
-			System.err.println(e.getMessage());
+			if (line.hasOption("xml")) {
+            	System.out.println("<errpr>" + e.getMessage() + "</error>");
+            } else {
+				System.err.println(e.getMessage());
+			}
+		} finally {
+			if (line.hasOption("xml")) {
+                    System.out.println("</output>");
+            }
 		}
 		System.out.println(); // extra line
 	}
@@ -87,6 +99,11 @@ public class JobCancel {
                 .withDescription("non-standard location of proxy cert")
                 .hasArg()
                 .create("proxypath"));
+
+         options.addOption(OptionBuilder
+                .withArgName("xml")
+                .withDescription("output as xml")
+                .create("xml"));
         
         return options;
 	}
@@ -118,7 +135,11 @@ public class JobCancel {
 		}
 
 		String vo = Util.readVOFromVOMSProxy(conf.getProxyPath());
-		System.out.println("Working VO: " + vo);
+		if (line.hasOption("xml")) {
+        	System.out.println("<vo>" + vo + "</vo>");
+        } else {
+			System.out.println("Working VO: " + vo);
+		}
 		String wmProxyURL = conf.getWMProxies().get(vo);
 		if (line.hasOption("e")) {
 			wmProxyURL = line.getOptionValue("e");
@@ -126,21 +147,45 @@ public class JobCancel {
 		if (wmProxyURL == null) {
 			throw new GridAPIException("Could not find WMProxy server for VO: " + vo);
 		}
-		System.out.println("Connecting to WMProxy service: " + wmProxyURL + "\n");
+
+		if (line.hasOption("xml")) {
+        	System.out.println("<wmProxy>" + wmProxyURL + "</wmProxy>");
+        } else {
+			System.out.println("Connecting to WMProxy service: " + wmProxyURL + "\n");
+		}
 	
+		if (line.hasOption("xml")) {
+        	System.out.println("<cancelledJobs>");
+        }
 		for (String jobId : jobIds) {
 			try {
-				System.out.println("Requesting cancellation of job: " + jobId);
+				if (line.hasOption("xml")) {
+                    System.out.println("<jobId>" + jobId + "</jobId>");
+                } else {
+					System.out.println("Requesting cancellation of job: " + jobId);
+				}
 				grid.cancelJob(wmProxyURL, jobId);
-				System.out.println("The cancellation request has been successfully submitted");
+				if (!line.hasOption("xml")) {
+					System.out.println("The cancellation request has been successfully submitted");
+				}
 			} catch (GridAPIException e) {
-				System.err.println(e.getMessage());
-				e.printStackTrace();
+				if (line.hasOption("xml")) {
+                    System.out.println("<error>" + e.getMessage() + "</error>");
+                } else {
+					System.err.println(e.getMessage());
+					e.printStackTrace();
+				}
 			}
-			if (jobIds.size() > 1) {
-				System.out.println();
+					if (jobIds.size() > 1) {
+						System.out.println();
+					}
+
 			}
-		}
+			
+		
+		if (line.hasOption("xml")) {
+        	System.out.println("</cancelledJobs>");
+        }
         
 	}
 	
