@@ -63,7 +63,7 @@ public class JobCancel {
             System.exit(-1);
 		} catch (Exception e) {
 			if (line.hasOption("xml")) {
-            	System.out.println("<errpr>" + e.getMessage() + "</error>");
+            	System.out.println("<error>" + e.getMessage() + "</error>");
             } else {
 				System.err.println(e.getMessage());
 			}
