@@ -44,13 +44,17 @@ public class JobOutput {
 	    Options options = setupOptions();
 	    HelpFormatter helpFormatter = new HelpFormatter();
 	    helpFormatter.setSyntaxPrefix("Usage: ");
+	    CommandLine line = null;
 		try {
-			CommandLine line = parser.parse(options, args);
+			line = parser.parse(options, args);
             if (line.hasOption("help")) {                
             	helpFormatter.printHelp(100, COMMAND, "\noptions:", options, "\n"+CLI.FOOTER, false);
         		System.out.println(); // extra line
                 System.exit(0);
             } else {
+            	if (line.hasOption("xml")) {
+                    System.out.println("<output>");
+                }
             	run(line.getArgs(), line);
             }
 		} catch (ParseException e) {
@@ -59,7 +63,15 @@ public class JobOutput {
     		System.out.println(); // extra line
             System.exit(-1);
 		} catch (Exception e) {
-			System.err.println(e.getMessage());
+			if (line.hasOption("xml")) {
+            	System.out.println("<error>" + e.getMessage() + "</error>");
+            } else {
+				System.err.println(e.getMessage());
+			}
+		} finally {
+			if (line.hasOption("xml")) {
+            	System.out.println("</output>");
+            }
 		}
 		System.out.println(); // extra line
 	}
@@ -102,6 +114,11 @@ public class JobOutput {
                 .withDescription("non-standard location of proxy cert")
                 .hasArg()
                 .create("proxypath"));
+
+        options.addOption(OptionBuilder
+                .withArgName("xml")
+                .withDescription("output as xml")
+                .create("xml"));
         
 //      options.addOption(OptionBuilder
 //		.withArgName("protocol")
@@ -139,7 +156,11 @@ public class JobOutput {
 		}
 
 		String vo = Util.readVOFromVOMSProxy(conf.getProxyPath());
-		System.out.println("Working VO: " + vo);
+		if (line.hasOption("xml")) {
+        	System.out.println("<vo>" + vo + "</vo>");
+        } else {
+			System.out.println("Working VO: " + vo);
+		}
 		String wmProxyURL = conf.getWMProxies().get(vo);
 		if (line.hasOption("e")) {
 			wmProxyURL = line.getOptionValue("e");
@@ -147,29 +168,66 @@ public class JobOutput {
 		if (wmProxyURL == null) {
 			throw new GridAPIException("Could not find WMProxy server for VO: " + vo);
 		}
-		System.out.println("Connecting to WMProxy service: " + wmProxyURL + "\n");
-	
+
+		if (line.hasOption("xml")) {
+        	System.out.println("<wmProxy>" + wmProxyURL + "</wmProxy>");
+        } else {
+			System.out.println("Connecting to WMProxy service: " + wmProxyURL + "\n");
+		}
+		if (line.hasOption("xml")) {
+        	System.out.println("<jobOutputs>");
+        }
 		for (String jobId : jobIds) {
-			System.out.println("Requesting output for job: " + jobId);
+			if (line.hasOption("xml")) {
+        	System.out.println("<jobOutput>");
+        	}
+			if (line.hasOption("xml")) {
+        		System.out.println("<jobId>" + jobId + "</jobId>");
+        	} else {
+				System.out.println("Requesting output for job: " + jobId);
+			}
 			try {
 				if (line.hasOption("list")) {
 					List<String> files = grid.listJobOutput(wmProxyURL, jobId);
+					if (line.hasOption("xml")) {
+        				System.out.println("<fileList>");
+        			} 
 					for (String file : files) {
-						System.out.println("- " + file);
+						if (line.hasOption("xml")) {
+        					System.out.println("<file>" + file + "</file>");
+        				} else {
+							System.out.println("- " + file);
+						}
 					}
+					if (line.hasOption("xml")) {
+        				System.out.println("</fileList>");
+        			} 
 				} else {
 					String outboxDir = line.getOptionValue("dir", 
-							System.getProperty("user.dir") + "/" + Util.getShortJobId(jobId));		
-					grid.getJobOutput(wmProxyURL, jobId, outboxDir, !line.hasOption("nopurge"));				
-			        System.out.println("Job output is uploaded to: " + new File(outboxDir).getAbsolutePath());
-				}
+					System.getProperty("user.dir") + "/" + Util.getShortJobId(jobId));		
+					grid.getJobOutput(wmProxyURL, jobId, outboxDir, !line.hasOption("nopurge"));
+					if (line.hasOption("xml")) {
+        				System.out.println("<dir>" + new File(outboxDir).getAbsolutePath() + "</dir>");
+        			} else {				
+			        	System.out.println("Job output is uploaded to: " + new File(outboxDir).getAbsolutePath());
+				}	}
 			} catch (GridAPIException e) {
-				System.err.println(e.getMessage());
+				if (line.hasOption("xml")) {
+        			System.out.println("<error>" + e.getMessage() + "</error>");
+        		} else {
+					System.err.println(e.getMessage());
+				}
 			}
 			if (jobIds.size() > 1) {
 				System.out.println();
 			}
+			if (line.hasOption("xml")) {
+        		System.out.println("</jobOutput>");
+        	}
 		}
+		if (line.hasOption("xml")) {
+        	System.out.println("</jobOutputs>");
+        }
 	}
 
 }
