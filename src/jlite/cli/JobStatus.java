@@ -71,7 +71,9 @@ public class JobStatus {
 				System.err.println(e.getMessage());
 			}
 		} finally {
-			System.out.println("</output>");
+			if (line.hasOption("xml")) {
+				System.out.println("</output>");
+			}
 		}
 		System.out.println(); // extra line
 	}
