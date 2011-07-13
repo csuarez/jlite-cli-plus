@@ -1,17 +1,17 @@
 ***************** JLite CLI Plus README ******************
 
+URL: https://github.com/csuarez/jlite-cli-plus
 License: Apache License 2.0
 
 jLite CLI Plus is a modification of jLite 0.2 CLI with new features:
 
 * Support to custom proxy paths for ALL commands. (Done!)
 * Support to set certificate key with a parameter for 'proxy-init' command. (Done!)
-* Support to XML output for ALL commands. (To Do!)
+* Support to XML output for ALL commands. (Done!)
 
-This project is under development!!!  
-If you're interested in use it, you can wait or collaborate :D
+This project it's currently stopped, and it won't have any new features in the future.
 
-
+You can get more info with the "-help" attribute of every command.
 
 ****************** ORIGINAL README ******************
 
